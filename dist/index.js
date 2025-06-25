@@ -5,8 +5,14 @@ if (major < 18 || major >= 26) {
   console.error(`Required Node.js 18.x or higher. Pleaseee download new LTS or currently version Node :3`);
   process.exit(1);
 }
-const arithmetic = require('../src/arithmetic');
+const { evaluate } = require('../src/arithmetic');
+const { generateProblem } = require('../src/arithmetic');
+const { checkAnswer } = require('../src/arithmetic');
+const { formatProblem } = require('../src/arithmetic');
 
 module.exports = {
-arithmetic
+  evaluate,
+  generateProblem,
+  checkAnswer,
+  formatProblem
 };
