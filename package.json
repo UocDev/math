@@ -1,9 +1,8 @@
 {
   "name": "@uocdev/math-fpe",
   "version": "1.0.6",
-  "description": "Math FPE (Fundamental Paper Education) is arithmetic mathematics base on animation knowledge FPE By Kaaaatie\"",
+  "description": "Math FPE (Fundamental Paper Education) is arithmetic mathematics base on animation knowledge FPE By Kaaaatie",
   "main": "dist/index.js",
-  "devDependencies": {},
   "scripts": {
     "test": "node dist/test.js"
   },
@@ -24,8 +23,4 @@
   "publishConfig": {
     "access": "publich"
   },
-  "bugs": {
-    "url": "https://github.com/UocDev/math/issues"
-  },
-  "homepage": "https://github.com/UocDev/math#readme"
 }
