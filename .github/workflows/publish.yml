@@ -1,0 +1,79 @@
+name: 🍪 Publish npm package
+
+on:
+  push:
+    tags:
+      - 'v*' # only publish on version tags like v1.0.0
+
+jobs:
+  test-matrix:
+    name: 🍪 Test on Node.js versions
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 19.x, 20.x, 21.x, 22.x, 23.x, 24.x]
+
+    steps:
+      - name: 🧾 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🧰 Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: 📦 Install dependencies
+        run: npm install
+
+      - name: ✅ Run tests
+        run: npm test # Replace with your custom script if needed
+
+  publish:
+    name: 🍪 Push repository into NPM
+    needs: test-matrix # ✅ Only run if tests passed
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # ✅ REQUIRED for provenance signing
+      contents: read
+
+    steps:
+      - name: 🧾 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🧰 Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: 🔐 Set up npm token
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: 📦 Install dependencies
+        run: npm install
+
+      - name: ✅ Run tests again on Node.js 18 (safe publish)
+        run: npm test
+
+      - name: 🧠 Check if version already published
+        id: check-version
+        run: |
+          PKG_NAME=$(node -p "require('./package.json').name")
+          PKG_VERSION=$(node -p "require('./package.json').version")
+
+          echo "📦 Package: $PKG_NAME"
+          echo "📌 Version: $PKG_VERSION"
+
+          if npm view "$PKG_NAME@$PKG_VERSION" version > /dev/null 2>&1; then
+            echo "✅ Already published: $PKG_NAME@$PKG_VERSION"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "🚀 Ready to publish: $PKG_NAME@$PKG_VERSION"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 🍪 Publish to npm
+        if: steps.check-version.outputs.skip != 'true'
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
