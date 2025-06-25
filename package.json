@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "devDependencies": {},
   "scripts": {
-    "test": "dist/test.js"
+    "test": "node dist/test.js"
   },
   "repository": {
     "type": "git",
